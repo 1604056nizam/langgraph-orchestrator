@@ -1,39 +1,17 @@
-import { MongoClient } from "mongodb";
 import dotenv from "dotenv";
 import { tool } from "@langchain/core/tools";
 import { z } from "zod";
 import path from "path";
-import { GoogleGenerativeAIEmbeddings } from "@langchain/google-genai";
-import { TaskType } from "@google/generative-ai";
+import { cosineSimilarity } from "../utils/vectorMath.js";
+import { getQueryEmbedding } from "../services/embeddings.js";
+import { getCollection } from "../db/connection.js";
 
 dotenv.config({ path: path.resolve(import.meta.dirname, "../../.env") });
 
-function dotProduct(vecA, vecB) {
-    return vecA.reduce((sum, val, idx) => sum + val * vecB[idx], 0);
-}
-
-function magnitude(vec) {
-    return Math.sqrt(vec.reduce((sum, val) => sum + val * val, 0));
-}
-
-function cosineSimilarity(vecA, vecB) {
-    return dotProduct(vecA, vecB) / (magnitude(vecA) * magnitude(vecB));
-}
-
 async function searchKnowledgeBase(query, limit = 1) {
-    const client = new MongoClient(process.env.MONGODB_URI);
-    await client.connect();
-
     try {
-        const db = client.db("chatbot_db");
-        const collection = db.collection("knowledge_chunks");
-        const embedding = new GoogleGenerativeAIEmbeddings({
-            apiKey: process.env.GOOGLE_API_KEY,
-            model: "gemini-embedding-001",
-            taskType: TaskType.RETRIEVAL_DOCUMENT,
-        });
-
-        const queryVector = await embedding.embedQuery(query);
+        const collection = await getCollection("knowledge_chunks");
+        const queryVector = await getQueryEmbedding(query);
         const chunks = await collection.find({}).toArray();
 
         const scoredChunks = chunks.map((chunk) => ({
@@ -47,8 +25,6 @@ async function searchKnowledgeBase(query, limit = 1) {
         return topChunks.map((chunk) => chunk.text).join("\n");
     } catch (error) {
         console.error("Error searching knowledge base:", error);
-    } finally {
-        await client.close();
     }
 }
 
@@ -66,8 +42,3 @@ export const docsTool = tool(
         })
     }
 );
-
-// Quick self-test run: node src/tools/docsTool.js
-// const testResult = await docsTool.invoke({ query: "What is the equipment allowance?" });
-// console.log("\n--- Top Retrieved Context from MongoDB ---");
-// console.log(testResult);
