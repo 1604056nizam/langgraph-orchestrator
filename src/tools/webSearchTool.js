@@ -99,5 +99,5 @@ export const webSearchTool = tool(
     }
 );
 
-const res = await webSearchTool.invoke({ query: "score of real madrid vs barcelone" });
-console.log(res);
+// const res = await webSearchTool.invoke({ query: "score of real madrid vs barcelone" });
+// console.log(res);
