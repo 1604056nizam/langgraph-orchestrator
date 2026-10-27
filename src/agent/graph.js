@@ -30,22 +30,3 @@ const workFlow = new StateGraph(MessagesAnnotation)
     .addEdge("tools", "agent")
 
 export const agent = workFlow.compile();
-
-console.log("Testing Langgraph orchestrator agent.. \n");
-console.log("--- Test 1: Casual Chat ---");
-const res1 = await agent.invoke({
-    messages: [{ role: "user", content: "Hi! What can you help me with?" }]
-});
-
-console.log("AI: ", res1.messages[res1.messages.length - 1].content);
-
-console.log("\n--- Test 2: Internal Docs (MongoDB) ---");
-const res2 = await agent.invoke({
-    messages: [{ role: "user", content: "What is the annual equipment allowance at NovaTech?" }],
-});
-console.log("AI:", res2.messages[res2.messages.length - 1].content);
-console.log("\n--- Test 3: Live Web Search (Tavily/DDG) ---");
-const res3 = await agent.invoke({
-    messages: [{ role: "user", content: "What was the latest score between Barcelona and Real Madrid?" }],
-});
-console.log("AI:", res3.messages[res3.messages.length - 1].content);

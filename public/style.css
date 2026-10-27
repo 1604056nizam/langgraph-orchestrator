@@ -1,0 +1,422 @@
+:root {
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;
+    --bg-surface: #334155;
+    --border-color: #334155;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --accent-color: #3b82f6;
+    --accent-hover: #2563eb;
+    --tool-bg: #1e293b;
+    --tool-border: #475569;
+    --tool-green: #10b981;
+    --tool-blue: #38bdf8;
+    --tool-purple: #a855f7;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    height: 100vh;
+    overflow: hidden;
+}
+
+.app-layout {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 280px;
+    background-color: var(--bg-secondary);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    padding: 1.25rem;
+    flex-shrink: 0;
+}
+
+.sidebar-header .brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: var(--text-primary);
+    margin-bottom: 1.25rem;
+}
+
+.logo-icon {
+    color: var(--accent-color);
+    font-size: 1.35rem;
+}
+
+.btn-new-chat {
+    width: 100%;
+    padding: 0.7rem 1rem;
+    background: transparent;
+    border: 1px dashed var(--border-color);
+    color: var(--text-primary);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.btn-new-chat:hover {
+    background-color: var(--bg-surface);
+    border-color: var(--accent-color);
+}
+
+.sidebar-section {
+    margin-top: 2rem;
+    flex: 1;
+}
+
+.section-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+    display: block;
+    margin-bottom: 0.75rem;
+}
+
+.tool-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.55rem 0.75rem;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.status-dot.green {
+    background-color: var(--tool-green);
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+}
+
+.status-dot.blue {
+    background-color: var(--tool-blue);
+    box-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
+}
+
+.status-dot.purple {
+    background-color: var(--tool-purple);
+    box-shadow: 0 0 8px rgba(168, 85, 247, 0.4);
+}
+
+.sidebar-footer {
+    border-top: 1px solid var(--border-color);
+    padding-top: 1rem;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+/* Chat Workspace */
+.chat-workspace {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: var(--bg-primary);
+    position: relative;
+}
+
+.chat-header {
+    padding: 1.1rem 2rem;
+    border-bottom: 1px solid var(--border-color);
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(8px);
+}
+
+.header-title h2 {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.header-title p {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    margin-top: 2px;
+}
+
+/* Chat Messages */
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 2rem 2rem 10rem 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-width: 900px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+/* Scrollbar styling */
+.chat-messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+    background: var(--bg-surface);
+    border-radius: 3px;
+}
+
+/* Message Rows */
+.message-row {
+    display: flex;
+    gap: 1rem;
+    width: 100%;
+}
+
+.message-row.user {
+    justify-content: flex-end;
+}
+
+.avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 0.95rem;
+}
+
+.assistant .avatar {
+    background: #1e3a8a;
+    color: #60a5fa;
+}
+
+.user .avatar {
+    background: #374151;
+    color: #f3f4f6;
+    order: 2;
+}
+
+.message-content {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    padding: 1rem 1.25rem;
+    border-radius: 12px;
+    max-width: 78%;
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+.user .message-content {
+    background: #1d4ed8;
+    color: #ffffff;
+    border: none;
+    order: 1;
+}
+
+/* Tool execution status pill */
+.tool-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(30, 41, 59, 0.8);
+    border: 1px solid var(--tool-border);
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    color: #38bdf8;
+    margin-bottom: 0.75rem;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.tool-status-pill.completed {
+    color: #10b981;
+    border-color: rgba(16, 185, 129, 0.4);
+}
+
+.tool-status-pill i.fa-spin {
+    color: #f59e0b;
+}
+
+/* Markdown typography */
+.message-content p {
+    margin-bottom: 0.6rem;
+}
+
+.message-content p:last-child {
+    margin-bottom: 0;
+}
+
+.message-content ul,
+.message-content ol {
+    margin-left: 1.5rem;
+    margin-bottom: 0.6rem;
+}
+
+.message-content code {
+    font-family: 'JetBrains Mono', monospace;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.88em;
+}
+
+/* Code block wrapper with copy button */
+.code-wrapper {
+    position: relative;
+    margin: 0.75rem 0;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #282c34;
+}
+
+.code-wrapper pre {
+    margin: 0;
+    padding: 1rem;
+    overflow-x: auto;
+}
+
+.code-copy-btn {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #cbd5e1;
+    padding: 0.25rem 0.55rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.code-copy-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    color: #ffffff;
+}
+
+/* Floating Input Box */
+.input-container {
+    position: absolute;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 4rem);
+    max-width: 860px;
+}
+
+.input-form {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: flex-end;
+    gap: 0.75rem;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+    transition: border-color 0.2s;
+}
+
+.input-form:focus-within {
+    border-color: var(--accent-color);
+}
+
+textarea#user-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 0.95rem;
+    resize: none;
+    max-height: 160px;
+    line-height: 1.5;
+}
+
+.input-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.icon-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    transition: all 0.2s;
+}
+
+.icon-btn:hover {
+    background: var(--bg-surface);
+    color: var(--text-primary);
+}
+
+.send-btn {
+    background: var(--accent-color);
+    color: #ffffff;
+}
+
+.send-btn:hover {
+    background: var(--accent-hover);
+    color: #ffffff;
+}
+
+.icon-btn.recording {
+    background: #ef4444;
+    color: white;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.input-footer-note {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-align: center;
+    margin-top: 0.5rem;
+}

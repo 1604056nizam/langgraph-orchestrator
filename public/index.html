@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LangGraph Orchestrator</title>
+
+    <!-- Font: Inter & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+
+    <!-- FontAwesome 6 Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Highlight.js Atom One Dark theme for code blocks -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
+
+    <!-- Custom Modern Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="dark">
+
+    <div class="app-layout">
+        <!-- Left Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="brand">
+                    <i class="fa-solid fa-network-wired logo-icon"></i>
+                    <span>Orchestrator</span>
+                </div>
+                <button id="new-chat-btn" class="btn-new-chat" title="New Conversation">
+                    <i class="fa-solid fa-plus"></i> New Chat
+                </button>
+            </div>
+
+            <div class="sidebar-section">
+                <span class="section-title">ACTIVE TOOLS</span>
+                <div class="tool-badge">
+                    <span class="status-dot green"></span>
+                    <i class="fa-solid fa-database"></i> MongoDB Vector Docs
+                </div>
+                <div class="tool-badge">
+                    <span class="status-dot blue"></span>
+                    <i class="fa-solid fa-globe"></i> Live Web Search
+                </div>
+                <div class="tool-badge">
+                    <span class="status-dot purple"></span>
+                    <i class="fa-solid fa-brain"></i> Multi-Turn Memory
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="system-status">
+                    <i class="fa-solid fa-server"></i> Localhost:3000
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Chat Workspace -->
+        <main class="chat-workspace">
+            <!-- Top Header -->
+            <header class="chat-header">
+                <div class="header-title">
+                    <h2>LangGraph AI Agent</h2>
+                    <p>Orchestrating MongoDB Vector RAG & Real-Time Web Research</p>
+                </div>
+            </header>
+
+            <!-- Message History Container -->
+            <div id="chat-messages" class="chat-messages">
+                <!-- Welcome Assistant Message -->
+                <div class="message-row assistant">
+                    <div class="avatar"><i class="fa-solid fa-robot"></i></div>
+                    <div class="message-content">
+                        <p>Hello! I am your <strong>LangGraph Orchestrator</strong>.</p>
+                        <p>I can help you by:</p>
+                        <ul>
+                            <li>Searching internal company policy from your <strong>local MongoDB database</strong>.
+                            </li>
+                            <li>Searching the <strong>live internet</strong> for real-time sports scores, facts, and
+                                news.</li>
+                            <li>Or having an intelligent conversation with multi-turn persistent memory!</li>
+                        </ul>
+                        <p><em>What would you like to explore today?</em></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Floating Input Box -->
+            <div class="input-container">
+                <form id="chat-form" class="input-form">
+                    <textarea id="user-input" placeholder="Ask a question about internal docs or search the web..."
+                        rows="1" autocomplete="off"></textarea>
+
+                    <div class="input-actions">
+                        <!-- Microphone Speech-To-Text -->
+                        <button type="button" id="voice-btn" class="icon-btn" title="Voice Input (Speech-to-Text)">
+                            <i class="fa-solid fa-microphone"></i>
+                        </button>
+
+                        <!-- Send Button -->
+                        <button type="submit" id="send-btn" class="icon-btn send-btn" title="Send message">
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </form>
+                <p class="input-footer-note">LangGraph dynamically selects MongoDB vector search or live web tools as
+                    needed.</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- External Markdown Parser & Syntax Highlighter -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+
+    <!-- Client-side Logic -->
+    <script src="app.js"></script>
+</body>
+
+</html>
+
+</html>
