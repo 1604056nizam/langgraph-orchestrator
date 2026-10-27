@@ -4,7 +4,6 @@ const userInput = document.getElementById("user-input");
 const voiceBtn = document.getElementById("voice-btn");
 const newChatBtn = document.getElementById("new-chat-btn");
 
-
 let sessionId = "session-" + Math.random().toString(36).substring(2, 9);
 
 marked.setOptions({
@@ -40,7 +39,6 @@ newChatBtn.addEventListener("click", () => {
         </div>
     `;
 });
-
 
 function appendMessage(role, text = "") {
     const row = document.createElement("div");
@@ -92,6 +90,12 @@ function attachCopyButtons(container) {
     });
 }
 
+setupVoiceInput(voiceBtn, (transcript) => {
+    userInput.value = transcript;
+    userInput.style.height = "auto";
+    userInput.style.height = Math.min(userInput.scrollHeight, 160) + "px";
+});
+
 chatForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const query = userInput.value.trim();
@@ -139,25 +143,24 @@ chatForm.addEventListener("submit", async (e) => {
                     const data = JSON.parse(jsonStr);
 
                     if (data.type === "tool_start") {
+                        const toolMeta = getToolMeta(data.tool);
                         if (!toolPill) {
                             toolPill = document.createElement("div");
                             toolPill.className = "tool-status-pill";
                             assistantContent.appendChild(toolPill);
                         }
-                        const toolLabel = data.tool === "search_internal_documents" ? "MongoDB Vector Docs" : "Live Web Search";
-                        toolPill.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Querying ${toolLabel}...`;
+                        toolPill.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Querying ${toolMeta.label}...`;
                         scrollToBottom();
                     } else if (data.type === "tool_end") {
+                        const toolMeta = getToolMeta(data.tool);
                         if (toolPill) {
                             toolPill.classList.add("completed");
-                            const toolLabel = data.tool === "search_internal_documents" ? "MongoDB Vector Docs" : "Live Web Search";
-                            toolPill.innerHTML = `<i class="fa-solid fa-check"></i> Consulted ${toolLabel}`;
+                            toolPill.innerHTML = `<i class="fa-solid fa-check"></i> Consulted ${toolMeta.label}`;
                         }
                     } else if (data.type === "token") {
                         const tokenChunk = data.content ?? data.token ?? "";
                         fullText += tokenChunk;
 
-                        // Render streaming markdown
                         const rendered = marked.parse(fullText);
                         if (toolPill) {
                             assistantContent.innerHTML = "";
@@ -182,49 +185,3 @@ chatForm.addEventListener("submit", async (e) => {
         assistantContent.innerHTML = `<span style="color:#ef4444">Connection failed: ${err.message}</span>`;
     }
 });
-
-// Web Speech API: Voice-To-Text (Microphone)
-if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
-    recognition.continuous = false;
-    recognition.interimResults = false;
-    recognition.lang = "en-US";
-
-    let isRecording = false;
-
-    voiceBtn.addEventListener("click", () => {
-        if (!isRecording) {
-            recognition.start();
-            voiceBtn.classList.add("recording");
-            isRecording = true;
-        } else {
-            recognition.stop();
-            voiceBtn.classList.remove("recording");
-            isRecording = false;
-        }
-    });
-
-    recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        userInput.value = transcript;
-        userInput.style.height = "auto";
-        userInput.style.height = Math.min(userInput.scrollHeight, 160) + "px";
-        voiceBtn.classList.remove("recording");
-        isRecording = false;
-    };
-
-    recognition.onerror = () => {
-        voiceBtn.classList.remove("recording");
-        isRecording = false;
-    };
-
-    recognition.onend = () => {
-        voiceBtn.classList.remove("recording");
-        isRecording = false;
-    };
-} else {
-    // Hide microphone button if browser doesn't support Web Speech API
-    voiceBtn.style.display = "none";
-}
-
