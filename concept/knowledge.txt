@@ -1,0 +1,10 @@
+Company Name: NovaTech Solutions
+Founding Year: 2021
+Headquarters: Sylhet, Bangladesh
+
+Employee Benefits & Policies:
+1. Working Hours: Flexible 8 hours per day, core collaboration window is 11:00 AM to 4:00 PM.
+2. Remote Work: Employees can work remotely up to 3 days per week.
+3. Equipment Allowance: Every engineer receives an annual tech budget of $1,200 for hardware and books.
+4. Annual Leave: 24 paid days of annual leave plus public holidays.
+5. Project Titan: The internal AI research initiative codenamed Titan is led by Dr. Farhan Ahmed, focusing on speech recognition in regional dialects.
