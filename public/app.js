@@ -4,7 +4,11 @@ const userInput = document.getElementById("user-input");
 const voiceBtn = document.getElementById("voice-btn");
 const newChatBtn = document.getElementById("new-chat-btn");
 
-let sessionId = "session-" + Math.random().toString(36).substring(2, 9);
+let sessionId = localStorage.getItem("chat_session_id");
+if (!sessionId) {
+    sessionId = "session-" + Math.random().toString(36).substring(2, 9);
+    localStorage.setItem("chat_session_id", sessionId);
+}
 
 marked.setOptions({
     highlight: function (code, lang) {
@@ -30,6 +34,7 @@ userInput.addEventListener("keydown", (e) => {
 
 newChatBtn.addEventListener("click", () => {
     sessionId = "session-" + Math.random().toString(36).substring(2, 9);
+    localStorage.setItem("chat_session_id", sessionId);
     chatMessages.innerHTML = `
         <div class="message-row assistant">
             <div class="avatar"><i class="fa-solid fa-robot"></i></div>
@@ -39,6 +44,22 @@ newChatBtn.addEventListener("click", () => {
         </div>
     `;
 });
+
+async function loadChatHistory() {
+    try {
+        const res = await fetch(`/api/history/${sessionId}`);
+        const data = await res.json();
+
+        if (data.messages && data.messages.length > 0) {
+            chatMessages.innerHTML = ""; // Clear welcome banner
+            data.messages.forEach(msg => {
+                appendMessage(msg.role, msg.content);
+            });
+        }
+    } catch (err) {
+        console.error("Failed to load history:", err);
+    }
+}
 
 function appendMessage(role, text = "") {
     const row = document.createElement("div");
@@ -185,3 +206,5 @@ chatForm.addEventListener("submit", async (e) => {
         assistantContent.innerHTML = `<span style="color:#ef4444">Connection failed: ${err.message}</span>`;
     }
 });
+
+loadChatHistory();

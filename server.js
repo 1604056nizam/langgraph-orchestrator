@@ -13,7 +13,24 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.resolve(import.meta.dirname, "public")));
 
-const sessions = new Map();
+app.get("/api/history/:sessionId", async (req, res) => {
+    try {
+        const { sessionId } = req.params;
+        const state = await agent.getState({
+            configurable: { thread_id: sessionId }
+        });
+
+        const messages = state.values?.messages || [];
+        const formatted = messages.map(msg => ({
+            role: msg._getType() === "human" ? "user" : "assistant",
+            content: typeof msg.content === "string" ? msg.content : JSON.stringify(msg.content)
+        }));
+
+        res.json({ messages: formatted });
+    } catch (err) {
+        res.json({ messages: [] });
+    }
+});
 
 app.post("/api/chat", async (req, res) => {
     const { message, sessionId = "default-session" } = req.body;
@@ -21,21 +38,18 @@ app.post("/api/chat", async (req, res) => {
         return res.status(400).json({ error: "Message is required" });
     }
 
-    if (!sessions.has(sessionId)) {
-        sessions.set(sessionId, []);
-    }
-
-    const history = sessions.get(sessionId);
-
     res.setHeader("Content-Type", "text/event-stream");
     res.setHeader("Cache-control", "no-cache");
     res.setHeader("Connection", "keep-alive");
 
     try {
-        const inputMessages = [...history, { role: "user", content: message }];
+        const inputMessage = [{ role: "user", content: message }];
         const eventStream = agent.streamEvents(
-            { messages: inputMessages },
-            { version: "v2" }
+            { messages: inputMessage },
+            {
+                version: "v2",
+                configurable: { thread_id: sessionId }
+            },
         );
 
         let finalAIMessage = "";
@@ -62,11 +76,6 @@ app.post("/api/chat", async (req, res) => {
                     output: typeof event.data?.output == "string" ? event.data.output.slice(0, 300) + "..." : "Complete",
                 })}\n\n`);
             }
-        }
-
-        history.push({ role: "user", content: message });
-        if (finalAIMessage) {
-            history.push({ role: "assistant", content: finalAIMessage });
         }
 
         res.write(`data: ${JSON.stringify({ type: "done" })}\n\n`);

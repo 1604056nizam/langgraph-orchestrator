@@ -5,6 +5,7 @@ import { docsTool } from "../tools/docsTool.js";
 import { webSearchTool } from "../tools/webSearchTool.js";
 import dotenv from "dotenv";
 import path from "path";
+import { checkpointer } from "../db/checkpointer.js";
 
 dotenv.config({ path: path.resolve(import.meta.dirname, "../../.env") });
 
@@ -29,4 +30,4 @@ const workFlow = new StateGraph(MessagesAnnotation)
     .addConditionalEdges("agent", toolsCondition)
     .addEdge("tools", "agent")
 
-export const agent = workFlow.compile();
+export const agent = workFlow.compile({ checkpointer });
