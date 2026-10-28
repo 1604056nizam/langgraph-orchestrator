@@ -168,8 +168,9 @@ body {
 /* Chat Messages */
 .chat-messages {
     flex: 1;
+    min-height: 0;
     overflow-y: auto;
-    padding: 2rem 2rem 10rem 2rem;
+    padding: 1.5rem 2rem;
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
@@ -319,14 +320,14 @@ body {
     color: #ffffff;
 }
 
-/* Floating Input Box */
+/* Fixed Bottom Input Area */
 .input-container {
-    position: absolute;
-    bottom: 1.5rem;
-    left: 50%;
-    transform: translateX(-50%);
-    width: calc(100% - 4rem);
-    max-width: 860px;
+    position: relative;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0.75rem 2rem 1.25rem 2rem;
+    flex-shrink: 0;
 }
 
 .input-form {
