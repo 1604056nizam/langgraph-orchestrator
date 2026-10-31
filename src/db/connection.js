@@ -1,17 +1,12 @@
 import { MongoClient } from "mongodb";
-import dotenv from "dotenv";
-import path from "path";
-
-dotenv.config({ path: path.resolve(import.meta.dirname, "../../.env") });
+import { config } from "../config/index.js";
 
 let client = null;
 let db = null;
 
-const DB_NAME = "chatbot_db";
-
 export async function getClient() {
     if (!client) {
-        client = new MongoClient(process.env.MONGODB_URI);
+        client = new MongoClient(config.db.uri);
         await client.connect();
     }
 
@@ -20,7 +15,7 @@ export async function getClient() {
 
 export async function getDb() {
     const client = await getClient();
-    return client.db(DB_NAME);
+    return client.db(config.db.name);
 }
 
 

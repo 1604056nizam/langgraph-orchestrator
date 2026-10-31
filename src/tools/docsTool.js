@@ -1,16 +1,13 @@
-import dotenv from "dotenv";
 import { tool } from "@langchain/core/tools";
 import { z } from "zod";
-import path from "path";
+import { config } from "../config/index.js";
 import { cosineSimilarity } from "../utils/vectorMath.js";
 import { getQueryEmbedding } from "../services/embeddings.js";
 import { getCollection } from "../db/connection.js";
 
-dotenv.config({ path: path.resolve(import.meta.dirname, "../../.env") });
-
-async function searchKnowledgeBase(query, limit = 1) {
+async function searchKnowledgeBase(query, limit = config.rag.topK) {
     try {
-        const collection = await getCollection("knowledge_chunks");
+        const collection = await getCollection(config.db.collections.knowledgeChunks);
         const queryVector = await getQueryEmbedding(query);
         const chunks = await collection.find({}).toArray();
 

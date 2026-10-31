@@ -1,42 +1,39 @@
-import dotenv from "dotenv";
 import { tool } from "@langchain/core/tools";
 import { z } from "zod";
 import { GoogleGenAI } from "@google/genai";
 import { search as duckSearch } from "duck-duck-scrape";
-import path from "path";
 import { ChatGroq } from "@langchain/groq";
 import { tavily } from "@tavily/core";
+import { config } from "../config/index.js";
 
-dotenv.config({ path: path.resolve(import.meta.dirname, "../../.env") });
-
-const withTimeout = (promise, ms = 5000) =>
+const withTimeout = (promise, ms = config.search.timeoutMs) =>
     Promise.race([
         promise,
         new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), ms)),
     ]);
 
 async function searchGoogle(query) {
-    const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY });
+    const ai = new GoogleGenAI({ apiKey: config.llm.googleApiKey });
     const response =
         await withTimeout(ai.models.generateContent({
-            model: "gemini-3.8-flash",
+            model: config.llm.geminiSearchModel,
             contents: `Search the web and provide a clear, factual answer for: ${query}`,
             config: {
                 thinkingConfig: {
                     thinkingBudget: 0,
                 },
             },
-        }, 5000));
+        }, config.search.timeoutMs));
     return response.text;
 }
 
 async function searchWithTavily(query) {
-    if (!process.env.TAVILY_API_KEY) {
+    if (!config.search.tavilyApiKey) {
         throw new Error("TAVILY_API_KEY not configured in .env");
     }
 
-    const tvly = tavily({ apiKey: process.env.TAVILY_API_KEY });
-    const response = await tvly.search(query, { max_results: 3 });
+    const tvly = tavily({ apiKey: config.search.tavilyApiKey });
+    const response = await tvly.search(query, { max_results: config.search.tavilyMaxResults });
     const result = response.results
         .map((r, i) => `[${i + 1}] ${r.title}\n${r.content}\nSource: ${r.url}`)
         .join("\n\n");
@@ -48,9 +45,9 @@ async function searchWithTavily(query) {
 
 async function searchWithGroq(query) {
     const groqSearchModel = new ChatGroq({
-        model: "openai/gpt-oss-120b",
-        apiKey: process.env.GROQ_API_KEY,
-        temperature: 0.1,
+        model: config.llm.primaryModel,
+        apiKey: config.llm.groqApiKey,
+        temperature: config.llm.searchFallbackTemperature,
     });
     const prompt = `You are a real-time factual knowledge search engine. Provide an accurate, comprehensive, and up-to-date factual answer for this query:\n\nQuery: ${query}`;
     const response = await groqSearchModel.invoke(prompt);

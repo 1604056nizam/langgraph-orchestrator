@@ -1,5 +1,4 @@
-import dotenv from "dotenv";
-import path from "path";
+import { config } from "../config/index.js";
 import { ChatGroq } from "@langchain/groq";
 import { DirectCapability } from "../capabilities/DirectCapability.js";
 import { WebSearchCapability } from "../capabilities/WebSearchCapability.js";
@@ -9,15 +8,11 @@ import { CRAGEvaluator } from "../services/evaluator.js";
 import { QueryRewriter } from "../services/queryRewriter.js";
 import { RetryPolicy } from "./policies/retryPolicy.js";
 
-dotenv.config({ path: path.resolve(import.meta.dirname, "../../.env") });
-
-
 export const model = new ChatGroq({
-    apiKey: process.env.GROQ_API_KEY,
-    model: "openai/gpt-oss-120b",
-    temperature: 0.2
+    apiKey: config.llm.groqApiKey,
+    model: config.llm.primaryModel,
+    temperature: config.llm.primaryTemperature
 });
-
 
 export const registry = new CapabilityRegistry();
 registry.register(new DirectCapability());
@@ -26,8 +21,7 @@ registry.register(new VectorDocsCapability());
 const router = new AdaptiveRouter(model, registry);
 const evaluator = new CRAGEvaluator(model);
 const rewriter = new QueryRewriter(model);
-const retryPolicy = new RetryPolicy(2);
-
+const retryPolicy = new RetryPolicy(config.rag.defaultMaxRetries);
 
 export async function routeNode(state) {
     const query = state.current_query || state.messages.at(-1)?.content;

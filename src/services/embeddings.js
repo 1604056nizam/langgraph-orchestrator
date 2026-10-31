@@ -1,14 +1,12 @@
-import dotenv from "dotenv";
-import path from "path";
+import { config } from "../config/index.js";
 import { GoogleGenerativeAIEmbeddings } from "@langchain/google-genai";
 import { TaskType } from "@google/generative-ai"
 
-dotenv.config({ path: path.resolve(import.meta.dirname, "../../.env") });
 
 export const embeddings = new GoogleGenerativeAIEmbeddings({
-    apiKey: process.env.GOOGLE_API_KEY,
+    apiKey: config.llm.googleApiKey,
     taskType: TaskType.RETRIEVAL_DOCUMENT,
-    model: "gemini-embedding-001"
+    model: config.llm.embeddingModel
 });
 
 export async function getQueryEmbedding(query) {

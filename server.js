@@ -1,14 +1,12 @@
 import express from "express";
 import cors from "cors";
 import path from "path";
-import dotenv from "dotenv";
+import { config } from "./src/config/index.js";
 import { agent } from "./src/agent/graph.js";
 import { HumanMessage } from "@langchain/core/messages";
 
-dotenv.config();
-
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = config.server.port;
 
 app.use(cors());
 app.use(express.json());

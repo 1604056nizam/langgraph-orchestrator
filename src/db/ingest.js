@@ -1,21 +1,19 @@
 import fs from "fs/promises";
-import path from "path";
-import dotenv from "dotenv";
+import { config } from "../config/index.js";
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import { getQueryEmbedding } from "../services/embeddings.js";
 import { getCollection, closeDb } from "./connection.js";
-
-dotenv.config({ path: path.resolve(import.meta.dirname, "../../.env") });
+import path from "path";
 
 async function ingest() {
-    const collection = await getCollection("knowledge_chunks");
+    const collection = await getCollection(config.db.collections.knowledgeChunks);
     console.log("Reading the raw data");
     const filePath = path.resolve(import.meta.dirname, "../../concept/knowledge.txt");
     const rawText = await fs.readFile(filePath, "utf-8");
 
     const splitter = new RecursiveCharacterTextSplitter({
-        chunkSize: 200,
-        chunkOverlap: 40
+        chunkSize: config.rag.chunkSize,
+        chunkOverlap: config.rag.chunkOverlap
     });
 
     const docs = await splitter.createDocuments([rawText]);
