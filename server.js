@@ -3,6 +3,7 @@ import cors from "cors";
 import path from "path";
 import dotenv from "dotenv";
 import { agent } from "./src/agent/graph.js";
+import { messageToGroqRole } from "@langchain/groq";
 
 dotenv.config();
 
@@ -45,7 +46,14 @@ app.post("/api/chat", async (req, res) => {
     try {
         const inputMessage = [{ role: "user", content: message }];
         const eventStream = agent.streamEvents(
-            { messages: inputMessage },
+            {
+                messages: inputMessage,
+                current_query: message,
+                attempts_per_capability: {},
+                excluded_capabilities: [],
+                retrieved_context: "",
+                evaluation_status: ""
+            },
             {
                 version: "v2",
                 configurable: { thread_id: sessionId }
@@ -55,7 +63,8 @@ app.post("/api/chat", async (req, res) => {
         let finalAIMessage = "";
 
         for await (const event of eventStream) {
-            if (event.event === "on_chat_model_stream" && event.data?.chunk.content) {
+            const currentNode = event.metadata?.langgraph_node;
+            if (event.event === "on_chat_model_stream" && event.data?.chunk.content && ((currentNode === "generator" || currentNode === "direct"))) {
                 const token = event.data.chunk.content;
                 finalAIMessage += token;
                 res.write(`data: ${JSON.stringify({ type: "token", content: token })}\n\n`);
