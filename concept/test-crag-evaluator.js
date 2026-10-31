@@ -147,4 +147,7 @@ async function runTest() {
     console.log(`Controller Decision 2: Status = ${decision2.status}`);
     console.log(`Excluded Capabilities: [${state.excluded_capabilities.join(", ")}] 🎯 (Notice: Dynamically excluded!)`);
 }
-runTest().catch(console.error);
+
+if (process.argv[1]?.endsWith("test-crag-evaluator.js")) {
+    runTest().catch(console.error);
+}

@@ -145,5 +145,9 @@ async function runTest() {
     console.log(`➡️ Fallback Route: [${fallbackDecision.destination}]`);
     console.log(`   Reason: ${fallbackDecision.reason}\n`);
 }
-runTest().catch(console.error);
+
+
+if (process.argv[1]?.endsWith("test-adaptive-capabilities.js")) {
+    runTest().catch(console.error);
+}
 
