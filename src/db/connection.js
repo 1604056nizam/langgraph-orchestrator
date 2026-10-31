@@ -18,7 +18,6 @@ export async function getDb() {
     return client.db(config.db.name);
 }
 
-
 export async function getCollection(collectionName) {
     const db = await getDb();
     return db.collection(collectionName);
