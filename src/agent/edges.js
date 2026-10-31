@@ -1,16 +1,14 @@
-//conditional edges
-//router -> selected capability
+// Post-execution lifecycle router (zero hardcoded capability names!)
 
-export function routeDecisionEdge(state) {
-    switch (state.current_capability) {
-        case "direct":
-            return "direct";
-        case "web_search":
-            return "web_search";
-        case "vectorstore":
-            return "vectorstore";
+export function postCapabilityEdge(state) {
+    switch (state.evaluation_status) {
+        case "COMPLETED":
+            return "end";
+        case "NEEDS_EVALUATION":
+            return "evaluate";
+        case "READY_TO_GENERATE":
         default:
-            return "direct";
+            return "generate";
     }
 }
 

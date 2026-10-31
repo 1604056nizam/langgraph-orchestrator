@@ -1,13 +1,21 @@
+import { config } from "../config/index.js";
+
 export class BaseCapability {
 
-    constructor(id, name, description, maxRetries = 2) {
+    constructor(id, name, description, mode = "context", requiresEvaluation = false, maxRetries = config.rag.defaultMaxRetries) {
         if (this.constructor === BaseCapability) {
             throw new Error("BaseCapability is abstract and cannot be instantiated directly.");
+        }
+
+        if (!id || !name || !description) {
+            throw new Error("Capability requires id, name, and description.");
         }
 
         this.id = id;
         this.name = name;
         this.description = description;
+        this.mode = mode;
+        this.requiresEvaluation = requiresEvaluation;
         this.maxRetries = maxRetries;
     }
 

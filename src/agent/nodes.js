@@ -15,7 +15,7 @@ export const model = new ChatGroq({
 });
 
 export const registry = new CapabilityRegistry();
-registry.register(new DirectCapability());
+registry.register(new DirectCapability(model));
 registry.register(new WebSearchCapability());
 registry.register(new VectorDocsCapability());
 const router = new AdaptiveRouter(model, registry);
@@ -35,31 +35,25 @@ export async function routeNode(state) {
     };
 }
 
-export async function directNode(state) {
-    console.log(`[Direct Node] Answering with parametric knowledge...`);
-    const response = await model.invoke(state.messages);
-    return {
-        messages: [response],
-        evaluation_status: "COMPLETED"
+export async function executeCapabilityNode(state) {
+    const capability = registry.get(state.current_capability);
+    if (!capability) {
+        throw new Error(`Capability '${state.current_capability}' is not registered.`);
     }
-}
 
-export async function webNode(state) {
-    console.log(`[Web Search Node] Searching live web for: "${state.current_query}"`);
-    const webCapability = registry.get("web_search");
-    const result = await webCapability.execute(state.current_query);
-    return {
-        retrieved_context: result,
-        evaluation_status: "READY_TO_GENERATE"
-    };
-}
+    console.log(`[Capability Executor] Running '${capability.name}' (${capability.id}) | mode=${capability.mode}`);
+    const output = await capability.execute(state.current_query, state);
 
-export async function docsNode(state) {
-    console.log(`[MongoDB RAG Node] Querying MongoDB for: "${state.current_query}"`);
-    const docsCapability = registry.get("vectorstore");
-    const result = await docsCapability.execute(state.current_query);
+    if (capability.mode === "direct") {
+        return {
+            messages: [output],
+            evaluation_status: "COMPLETED"
+        }
+    }
+
     return {
-        retrieved_context: result
+        retrieved_context: output,
+        evaluation_status: capability.requiresEvaluation ? "NEEDS_EVALUATION" : "READY_TO_GENERATE"
     };
 }
 
@@ -105,10 +99,14 @@ export async function generatorNode(state) {
     - If the context contains web search results, synthesize the live facts.
     - Format response in clean Markdown.
     `;
-    const response = await model.invoke([
-        ...state.messages.slice(0, -1),
-        { role: "user", content: prompt }
-    ]);
+    const response = await model.invoke(
+        [
+            ...state.messages.slice(0, -1),
+            { role: "user", content: prompt }
+        ],
+        { tags: ["final_output"] }
+    );
+
     return {
         messages: [response],
         evaluation_status: "COMPLETED"

@@ -62,8 +62,8 @@ app.post("/api/chat", async (req, res) => {
         let finalAIMessage = "";
 
         for await (const event of eventStream) {
-            const currentNode = event.metadata?.langgraph_node;
-            if (event.event === "on_chat_model_stream" && event.data?.chunk.content && ((currentNode === "generator" || currentNode === "direct"))) {
+            const isFinalOutput = event.tags?.includes("final_output");
+            if (event.event === "on_chat_model_stream" && event.data?.chunk.content && isFinalOutput) {
                 const token = event.data.chunk.content;
                 finalAIMessage += token;
                 res.write(`data: ${JSON.stringify({ type: "token", content: token })}\n\n`);
