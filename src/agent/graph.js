@@ -1,7 +1,7 @@
 import { StateGraph, START, END } from "@langchain/langgraph";
 import { checkpointer } from "../db/checkpointer.js";
 import { GraphState } from "./state.js";
-import { routeNode, executeCapabilityNode, evaluatorNode, rewriterNode, generatorNode } from "./nodes.js";
+import { routeNode, executeCapabilityNode, evaluatorNode, rewriterNode, generatorNode, contextualizeNode } from "./nodes.js";
 import { postCapabilityEdge, cragDecisionEdge } from "./edges.js";
 
 const workFlow = new StateGraph(GraphState)
@@ -10,8 +10,10 @@ const workFlow = new StateGraph(GraphState)
     .addNode("evaluator", evaluatorNode)
     .addNode("rewriter", rewriterNode)
     .addNode("generator", generatorNode)
+    .addNode("contextualizer", contextualizeNode)
 
-    .addEdge(START, "router")
+    .addEdge(START, "contextualizer")
+    .addEdge("contextualizer", "router")
     .addEdge("router", "execute_capability")
     .addConditionalEdges("execute_capability", postCapabilityEdge, {
         end: END,

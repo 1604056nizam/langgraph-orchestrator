@@ -7,6 +7,8 @@ import { CapabilityRegistry, AdaptiveRouter } from "../capabilities/CapabilityRe
 import { CRAGEvaluator } from "../services/evaluator.js";
 import { QueryRewriter } from "../services/queryRewriter.js";
 import { RetryPolicy } from "./policies/retryPolicy.js";
+import { QueryContextualizer } from "../services/queryContextualizer.js";
+import { HumanMessage } from "@langchain/core/messages";
 
 export const model = new ChatGroq({
     apiKey: config.llm.groqApiKey,
@@ -22,6 +24,7 @@ const router = new AdaptiveRouter(model, registry);
 const evaluator = new CRAGEvaluator(model);
 const rewriter = new QueryRewriter(model);
 const retryPolicy = new RetryPolicy(config.rag.defaultMaxRetries);
+const contextualizer = new QueryContextualizer(model);
 
 export async function routeNode(state) {
     const query = state.current_query || state.messages.at(-1)?.content;
@@ -102,7 +105,7 @@ export async function generatorNode(state) {
     const response = await model.invoke(
         [
             ...state.messages.slice(0, -1),
-            { role: "user", content: prompt }
+            new HumanMessage(prompt)
         ],
         { tags: ["final_output"] }
     );
@@ -111,4 +114,31 @@ export async function generatorNode(state) {
         messages: [response],
         evaluation_status: "COMPLETED"
     };
+}
+
+export async function contextualizeNode(state) {
+    const rawQuery = state.current_query || state.messages.at(-1)?.content || "";
+    const priorMessages = state.messages.slice(0, -1);
+    const summary = state.conversation_summary || "";
+
+    if (priorMessages.length === 0 && !summary) {
+        return { current_query: rawQuery };
+    }
+
+    const recentHistoryText = priorMessages.slice(-6).map(msg => {
+        const isHuman = msg?._getType() === "human" || msg.role === "user";
+        const content = typeof msg.content === "string" ? msg.content : JSON.stringify(msg.content);
+
+        return `${isHuman ? "User" : "Assistant"}: ${content}`;
+    }).join("\n");
+
+    const result = await contextualizer.contextualize(rawQuery, recentHistoryText, summary);
+
+    if (result.was_contextualized) {
+        console.log(`[Contextualizer Node] Expanded follow-up: "${rawQuery}" ➡️ "${result.standalone_query}"`);
+    }
+
+    return {
+        current_query: result.standalone_query
+    }
 }

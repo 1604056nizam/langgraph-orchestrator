@@ -32,5 +32,9 @@ export const GraphState = Annotation.Root({
     evaluation_reason: Annotation({
         reducer: (prev, next) => next ?? prev,
         default: () => ""
+    }),
+    conversation_summary: Annotation({
+        reducer: (prev, next) => next ?? prev,
+        default: () => ""
     })
 });
