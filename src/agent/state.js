@@ -1,8 +1,8 @@
-import { Annotation } from "@langchain/langgraph";
+import { Annotation, messagesStateReducer } from "@langchain/langgraph";
 
 export const GraphState = Annotation.Root({
     messages: Annotation({
-        reducer: (prev, next) => prev.concat(next),
+        reducer: messagesStateReducer,
         default: () => []
     }),
     current_query: Annotation({

@@ -1,10 +1,44 @@
-Company Name: NovaTech Solutions
-Founding Year: 2021
-Headquarters: Sylhet, Bangladesh
+================================================================================
+NOVATECH SOLUTIONS — OFFICIAL INTERNAL HANDBOOK & ENGINEERING PLAYBOOK (2026)
+================================================================================
 
-Employee Benefits & Policies:
-1. Working Hours: Flexible 8 hours per day, core collaboration window is 11:00 AM to 4:00 PM.
-2. Remote Work: Employees can work remotely up to 3 days per week.
-3. Equipment Allowance: Every engineer receives an annual tech budget of $1,200 for hardware and books.
-4. Annual Leave: 24 paid days of annual leave plus public holidays.
-5. Project Titan: The internal AI research initiative codenamed Titan is led by Dr. Farhan Ahmed, focusing on speech recognition in regional dialects.
+SECTION 1: COMPANY OVERVIEW & OFFICE LOCATIONS
+Company Name: NovaTech Solutions Ltd.
+Founding Year: 2021
+Global Headquarters: Zindabazar Tech Park, Level 8, Sylhet, Bangladesh.
+Engineering Hub: Banani Road 11, Dhaka, Bangladesh.
+Chief Executive Officer (CEO): Tariqul Islam
+Chief Technology Officer (CTO): Nadia Rahman
+
+NovaTech Solutions builds enterprise speech intelligence, multilingual customer support agents, and cloud analytics platforms for telecommunications and fintech clients across South and Southeast Asia. Currently, the organization employs 185 full-time staff across Engineering, Applied AI Research, Product Design, Security, and People Operations.
+
+SECTION 2: WORKING HOURS, HYBRID SCHEDULE & OFFICE MEALS
+Standard Working Hours: NovaTech operates on a flexible 8-hour workday from Sunday through Thursday (Friday and Saturday are official weekend holidays in Bangladesh).
+Core Collaboration Window: All full-time employees must be reachable on Slack and available for synchronous meetings between 11:00 AM and 4:00 PM BST (UTC+6). Outside core hours, engineers may structure their deep-work blocks early in the morning or late in the evening.
+Remote & Hybrid Work Policy: Employees can work remotely up to 3 days per week. Tuesdays and Thursdays are designated "Anchor Days" for teams based near the Sylhet or Dhaka offices to encourage whiteboard design sessions and mentorship. Fully remote arrangements require VP-level approval.
+Lunch & Cafeteria Window: Catered hot lunch is served daily at both the Sylhet and Dhaka offices from 1:00 PM to 2:15 PM, alongside a 15-minute afternoon prayer and tea break at 4:15 PM. Employees working remotely on non-anchor days do not receive a separate daily meal stipend.
+
+SECTION 3: EQUIPMENT ALLOWANCE & HOME OFFICE REIMBURSEMENT
+Annual Tech & Equipment Budget: Every full-time engineer and designer receives an annual budget of $1,200 USD (or local BDT equivalent) for hardware, ergonomic gear, and technical books.
+Eligible Purchases: The $1,200 equipment allowance covers external 4K monitors, mechanical keyboards, ergonomic chairs, motorized standing desks, noise-canceling headphones, USB microphones, O'Reilly subscriptions, and technical textbooks.
+Excluded Purchases: Smartphones, personal tablets, gaming consoles, home internet bills, and decorative furniture are strictly excluded from the equipment allowance.
+Reimbursement Process: Employees must upload itemized PDF receipts to the internal portal ("NovaPay") before the 25th of the month. Approved claims are paid out alongside the monthly salary cycle on the last working day of that month. Unused budget does not roll over into the next calendar year.
+
+SECTION 4: LEAVE POLICIES, HEALTHCARE & PARENTAL BENEFITS
+Annual Paid Leave: All full-time employees receive 24 paid days of annual vacation leave per calendar year, in addition to 11 government-gazetted public holidays. Up to 8 unused annual leave days may be carried forward into the following year.
+Sick & Caregiver Leave: Employees are granted 14 days of paid sick leave annually. A medical certificate is only required if sick leave exceeds 3 consecutive working days.
+Parental Leave Policy: Primary caregivers receive 16 weeks of fully paid parental leave, while secondary caregivers receive 4 weeks of fully paid leave within the first 6 months of a child's birth or adoption.
+Comprehensive Health Insurance: NovaTech provides zero-deductible inpatient and outpatient health coverage through MetLife for the employee, their spouse, and up to 2 dependent children, capped at 800,000 BDT per family per year, plus an annual dental and optical limit of 25,000 BDT.
+
+SECTION 5: INTERNAL R&D INITIATIVES (PROJECT TITAN & PROJECT AURORA)
+Project Titan (Dialectal Speech Recognition): NovaTech's flagship internal AI research initiative codenamed "Project Titan" is led by Principal Research Scientist Dr. Farhan Ahmed. Project Titan focuses on low-latency automatic speech recognition (ASR) for regional Bengali dialects—specifically Sylheti, Chittagonian, and Noakhali—using a custom fine-tuned Conformer-CTC architecture quantized to INT8 for edge deployment. Project Titan's milestone v2.4 targets a Word Error Rate (WER) below 7.5% on noisy mobile call audio.
+Project Aurora (Autonomous FinTech Compliance): Led by Staff Engineer Samira Kabir, Project Aurora is an internal multi-agent audit engine that flags anomalous cross-border ledger transactions in real time using graph neural networks and deterministic rule policies. Aurora processes up to 12,000 events per second on Kafka streams.
+
+SECTION 6: ENGINEERING STANDARDS, DEPLOYMENTS & ON-CALL ROTATION
+Code Review & CI/CD Standards: Every pull request targeting the `main` branch requires at least 2 approvals (including 1 CODEOWNER), passing Vitest unit suites with >= 80% diff coverage, and zero high-severity Snyk vulnerability alerts.
+Production Deployment Freeze: Production deployments are permitted Sunday through Wednesday between 10:00 AM and 5:00 PM BST. No production releases are allowed on Thursdays after 12:00 PM BST unless signed off by the CTO as a Sev-1 security hotfix.
+On-Call Engineering Rotation & Stipend: Senior and mid-level backend engineers rotate through a 7-day primary/secondary PagerDuty schedule once every 6 weeks. Being on-call carries a flat weekly standby bonus of $150 USD. If a Sev-1 or Sev-2 incident triggers active mitigation on a Friday or Saturday weekend, the responding engineer receives an additional $75 USD incident payout plus 1 compensatory day off ("comp day") to be taken within 30 days.
+
+SECTION 7: SECURITY & DATA CLASSIFICATION POLICY
+Zero-Secret Repository Rule: API keys, database connection URIs, customer PII, and TLS private keys must never be committed to Git repositories. All production secrets are injected at runtime via HashiCorp Vault.
+Device Security & VPN: Company laptops must maintain FileVault or BitLocker full-disk encryption, CrowdStrike endpoint protection, and Tailscale WireGuard mesh VPN access when connecting to staging or production Kubernetes clusters.

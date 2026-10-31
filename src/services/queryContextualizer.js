@@ -14,6 +14,7 @@ export class QueryContextualizer {
         const prompt = `You are a conversation contextualizer. Given a conversation summary, recent turns, and the user's latest message, reformulate the latest message into a standalone query ONLY IF it depends on prior context (e.g., uses pronouns like "it", "that", "they", "there", or asks a follow-up fragment like "what about part-time?").
         Rules:
         - Do NOT answer the question.
+        - Keep first-person pronouns ("my", "me", "I") UNCHANGED when the user asks about themselves or earlier parts of the conversation.
         - If the latest message is already self-contained, a greeting/acknowledgment ("thanks", "hi"), or switches to a new topic, return it UNCHANGED.
         ${summary ? `Conversation Summary:\n${summary}\n` : ""}
         Recent Conversation:

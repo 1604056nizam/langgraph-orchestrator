@@ -1,25 +1,20 @@
 import { tool } from "@langchain/core/tools";
 import { z } from "zod";
-import { config } from "../config/index.js";
-import { cosineSimilarity } from "../utils/vectorMath.js";
 import { getQueryEmbedding } from "../services/embeddings.js";
-import { getCollection } from "../db/connection.js";
+import { vectorStore } from "../db/vectorStore.js";
 
-async function searchKnowledgeBase(query, limit = config.rag.topK) {
+async function searchKnowledgeBase(query) {
     try {
-        const collection = await getCollection(config.db.collections.knowledgeChunks);
         const queryVector = await getQueryEmbedding(query);
-        const chunks = await collection.find({}).toArray();
+        const results = await vectorStore.search(queryVector);
 
-        const scoredChunks = chunks.map((chunk) => ({
-            text: chunk.text,
-            score: cosineSimilarity(queryVector, chunk.vector)
-        }));
+        if (results.length === 0) {
+            return "";
+        }
 
-        scoredChunks.sort((a, b) => b.score - a.score);
+        console.log(`[VectorStore] Matched ${results.length} chunks (top score: ${results[0].score.toFixed(3)})`);
+        return results.map((chunk) => chunk.text).join("\n\n---\n\n");
 
-        const topChunks = scoredChunks.slice(0, limit);
-        return topChunks.map((chunk) => chunk.text).join("\n");
     } catch (error) {
         console.error("Error searching knowledge base:", error);
     }
@@ -27,9 +22,9 @@ async function searchKnowledgeBase(query, limit = config.rag.topK) {
 
 export const docsTool = tool(
     async ({ query }) => {
-        console.log("Searching local moongodb knowledgebase");
+        console.log("Searching MongoDB HNSW vector index...");
         const context = await searchKnowledgeBase(query);
-        return context || `No knowledge found`;
+        return context || `No matching internal documents found.`;
     },
     {
         name: "search_internal_documents",

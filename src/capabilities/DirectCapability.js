@@ -1,3 +1,4 @@
+import { SystemMessage } from "@langchain/core/messages";
 import { BaseCapability } from "./BaseCapability.js";
 
 export class DirectCapability extends BaseCapability {
@@ -8,7 +9,15 @@ export class DirectCapability extends BaseCapability {
 
     async execute(query, state = {}) {
         //return `[Direct Response Generated for: "${query}"]`;
-        return await this.model.invoke(state.messages, {
+        const messages = state.conversation_summary
+            ? [
+                new SystemMessage(`Summary of earlier conversation:\n${state.conversation_summary}`),
+                ...state.messages
+            ]
+            : state.messages;
+
+
+        return await this.model.invoke(messages, {
             tags: ["final_output"]
         });
     }

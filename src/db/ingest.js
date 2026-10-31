@@ -1,12 +1,12 @@
 import fs from "fs/promises";
 import { config } from "../config/index.js";
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
-import { getQueryEmbedding } from "../services/embeddings.js";
+import { getDocumentsEmbedding } from "../services/embeddings.js";
+import { vectorStore } from "./vectorStore.js";
 import { getCollection, closeDb } from "./connection.js";
 import path from "path";
 
 async function ingest() {
-    const collection = await getCollection(config.db.collections.knowledgeChunks);
     console.log("Reading the raw data");
     const filePath = path.resolve(import.meta.dirname, "../../concept/knowledge.txt");
     const rawText = await fs.readFile(filePath, "utf-8");
@@ -19,26 +19,23 @@ async function ingest() {
     const docs = await splitter.createDocuments([rawText]);
 
     console.log(`created ${docs.length} chunks from document. `);
+    console.log("Generating batch document embeddings...");
 
+    const texts = docs.map((doc) => doc.pageContent);
+    const vectors = await getDocumentsEmbedding(texts);
 
-    await collection.deleteMany({});
-    console.log("Cleared previous chunks from mongodb");
+    const chunkRecords = docs.map((doc, index) => ({
+        text: doc.pageContent,
+        vector: vectors[index],
+        source: "knowledge.txt",
+        chunkIndex: index,
+        createdAt: new Date()
+    }));
 
-    console.log("Generating embeddings and inserting into db");
-    for (const [chunkIndex, chunk] of docs.entries()) {
-        const text = chunk.pageContent;
-        const vector = await getQueryEmbedding(text);
-
-        await collection.insertOne({
-            text,
-            vector,
-            source: "knowledge.txt",
-            chunkIndex: chunkIndex,
-            createdAt: new Date(),
-        });
-    }
-
-    console.log("Ingestion completed!");
+    console.log("Saving chunks into MongoDB...");
+    await vectorStore.replaceAllChunks(chunkRecords);
+    await vectorStore.ensureVectorIndex();
+    console.log("Ingestion & HNSW Vector Index completed!");
     await closeDb();
 }
 

@@ -42,7 +42,8 @@ export const config = Object.freeze({
         primaryTemperature: 0.2,
         searchFallbackTemperature: 0.1,
         geminiSearchModel: "gemini-3.8-flash",
-        embeddingModel: "gemini-embedding-001"
+        embeddingModel: "gemini-embedding-001",
+        embeddingDimensions: 3072
     },
     rag: {
         topK: 5,

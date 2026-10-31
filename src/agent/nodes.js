@@ -8,7 +8,8 @@ import { CRAGEvaluator } from "../services/evaluator.js";
 import { QueryRewriter } from "../services/queryRewriter.js";
 import { RetryPolicy } from "./policies/retryPolicy.js";
 import { QueryContextualizer } from "../services/queryContextualizer.js";
-import { HumanMessage } from "@langchain/core/messages";
+import { HumanMessage, SystemMessage, RemoveMessage } from "@langchain/core/messages";
+import { MemorySummarizer } from "../services/memorySummarizer.js";
 
 export const model = new ChatGroq({
     apiKey: config.llm.groqApiKey,
@@ -25,6 +26,7 @@ const evaluator = new CRAGEvaluator(model);
 const rewriter = new QueryRewriter(model);
 const retryPolicy = new RetryPolicy(config.rag.defaultMaxRetries);
 const contextualizer = new QueryContextualizer(model);
+const summarizer = new MemorySummarizer(model);
 
 export async function routeNode(state) {
     const query = state.current_query || state.messages.at(-1)?.content;
@@ -102,9 +104,11 @@ export async function generatorNode(state) {
     - If the context contains web search results, synthesize the live facts.
     - Format response in clean Markdown.
     `;
+
+    const historyMessages = state.conversation_summary ? [new SystemMessage(`Summary of earlier conversation:\n${state.conversation_summary}`), ...state.messages.slice(0, -1)] : state.messages.slice(0, -1);
     const response = await model.invoke(
         [
-            ...state.messages.slice(0, -1),
+            ...historyMessages,
             new HumanMessage(prompt)
         ],
         { tags: ["final_output"] }
@@ -141,4 +145,23 @@ export async function contextualizeNode(state) {
     return {
         current_query: result.standalone_query
     }
+}
+
+export async function summarizerNode(state) {
+    const keepCount = config.memory.recentMessagesToKeep;
+    const messagesToSummarize = keepCount > 0 ? state.messages.slice(0, -keepCount) : state.messages;
+
+    if (messagesToSummarize.length === 0) {
+        return {};
+    }
+
+    console.log(`[Summarizer Node] Compacting ${messagesToSummarize.length} older messages into running summary...`);
+
+    const updatedSummary = await summarizer.summarize(state.conversation_summary, messagesToSummarize);
+    const deleteOperations = messagesToSummarize.map((msg) => new RemoveMessage({ id: msg.id }));
+
+    return {
+        conversation_summary: updatedSummary,
+        messages: deleteOperations
+    };
 }
