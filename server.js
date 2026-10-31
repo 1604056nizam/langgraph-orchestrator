@@ -3,7 +3,7 @@ import cors from "cors";
 import path from "path";
 import dotenv from "dotenv";
 import { agent } from "./src/agent/graph.js";
-import { messageToGroqRole } from "@langchain/groq";
+import { HumanMessage } from "@langchain/core/messages";
 
 dotenv.config();
 
@@ -29,6 +29,7 @@ app.get("/api/history/:sessionId", async (req, res) => {
 
         res.json({ messages: formatted });
     } catch (err) {
+        console.error("Error in /api/history:", err);
         res.json({ messages: [] });
     }
 });
@@ -44,7 +45,7 @@ app.post("/api/chat", async (req, res) => {
     res.setHeader("Connection", "keep-alive");
 
     try {
-        const inputMessage = [{ role: "user", content: message }];
+        const inputMessage = [new HumanMessage(message)];
         const eventStream = agent.streamEvents(
             {
                 messages: inputMessage,
