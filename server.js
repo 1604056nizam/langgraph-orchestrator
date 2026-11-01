@@ -4,9 +4,10 @@ import path from "path";
 import { config } from "./src/config/index.js";
 import { agent } from "./src/agent/graph.js";
 import { HumanMessage } from "@langchain/core/messages";
+import { findAvailablePort } from "./src/utils/portFinder.js"
 
 const app = express();
-const PORT = config.server.port;
+const PORT = await findAvailablePort(config.server.port);
 
 app.use(cors());
 app.use(express.json());
