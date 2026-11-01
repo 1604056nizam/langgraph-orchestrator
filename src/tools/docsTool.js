@@ -28,7 +28,7 @@ export const docsTool = tool(
     },
     {
         name: "search_internal_documents",
-        description: "Search internal company policies, benefits, employee information, and organization details from local MongoDB.",
+        description: "Search principal software engineer qualification, responsibility, expectation details from local MongoDB.",
         schema: z.object({
             query: z.string().describe("The specific question or topic to search for in internal documents"),
         })
