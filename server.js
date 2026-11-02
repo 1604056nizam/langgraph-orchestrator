@@ -7,7 +7,7 @@ import { HumanMessage } from "@langchain/core/messages";
 import { findAvailablePort } from "./src/utils/portFinder.js"
 
 const app = express();
-const PORT = await findAvailablePort(config.server.port);
+const PORT = config.server.nodeEnv === "production" ? config.server.port : await findAvailablePort(config.server.port);
 
 app.use(cors());
 app.use(express.json());
@@ -40,8 +40,10 @@ app.post("/api/chat", async (req, res) => {
     }
 
     res.setHeader("Content-Type", "text/event-stream");
-    res.setHeader("Cache-control", "no-cache");
+    res.setHeader("Cache-control", "no-cache, no-transform");
     res.setHeader("Connection", "keep-alive");
+    res.setHeader("X-Accel-Buffering", "no");
+    res.flushHeaders();
 
     try {
         const inputMessage = [new HumanMessage(message)];

@@ -47,7 +47,7 @@ newChatBtn.addEventListener("click", () => {
 
 async function loadChatHistory() {
     try {
-        const res = await fetch(`/api/history/${sessionId}`);
+        const res = await fetch(`api/history/${sessionId}`);
         const data = await res.json();
 
         if (data.messages && data.messages.length > 0) {
@@ -131,7 +131,7 @@ chatForm.addEventListener("submit", async (e) => {
     assistantContent.innerHTML = `<em>Thinking...</em>`;
 
     try {
-        const response = await fetch("/api/chat", {
+        const response = await fetch("api/chat", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ message: query, sessionId })

@@ -5,6 +5,7 @@ import { z } from "zod";
 dotenv.config({ path: path.resolve(import.meta.dirname, "../../.env") });
 
 const EnvSchema = z.object({
+    NODE_ENV: z.enum(["development", "production"]).default("development"),
     PORT: z.coerce.number().default(3000),
     MONGODB_URI: z.string().min(1, "MONGODB_URI is required"),
     DB_NAME: z.string().default("chatbot_db"),
@@ -25,7 +26,8 @@ const env = parsed.data;
 
 export const config = Object.freeze({
     server: {
-        port: env.PORT
+        port: env.PORT,
+        nodeEnv: env.NODE_ENV
     },
     db: {
         uri: env.MONGODB_URI,
