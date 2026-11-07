@@ -33,7 +33,8 @@ export const config = Object.freeze({
         uri: env.MONGODB_URI,
         name: env.DB_NAME,
         collections: {
-            knowledgeChunks: "knowledge_chunks"
+            knowledgeChunks: "knowledge_chunks",
+            workspaceActions: "workspace_actions"
         },
         vectorIndexName: "vector_index"
     },

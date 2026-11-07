@@ -56,6 +56,10 @@ async function loadChatHistory() {
                 appendMessage(msg.role, msg.content);
             });
         }
+        if (data.pendingInterrupt) {
+            const assistantContent = appendMessage("assistant", "");
+            renderApprovalCard(data.pendingInterrupt, assistantContent);
+        }
     } catch (err) {
         console.error("Failed to load history:", err);
     }
@@ -117,24 +121,54 @@ setupVoiceInput(voiceBtn, (transcript) => {
     userInput.style.height = Math.min(userInput.scrollHeight, 160) + "px";
 });
 
-chatForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const query = userInput.value.trim();
-    if (!query) return;
+function renderApprovalCard(payload, assistantContent) {
+    const card = document.createElement("div");
+    card.className = "approval-card";
+    card.innerHTML = `
+        <div class="approval-header">
+            <i class="fa-solid fa-shield-halved"></i>
+            <span>Human Approval Required</span>
+            <span class="approval-badge">${payload.action_type || "action"}</span>
+        </div>
+        <div class="approval-title">${payload.title || "Action Request"}</div>
+        <div class="approval-details">${payload.details || ""}</div>
+        <div class="approval-summary">${payload.summary || "Do you approve this action?"}</div>
+        <div class="approval-actions">
+            <button type="button" class="btn-approve">
+                <i class="fa-solid fa-check"></i> Approve
+            </button>
+            <button type="button" class="btn-reject">
+                <i class="fa-solid fa-xmark"></i> Reject
+            </button>
+        </div>
+    `;
 
-    userInput.value = "";
-    userInput.style.height = "auto";
+    assistantContent.innerHTML = "";
+    assistantContent.appendChild(card);
+    scrollToBottom();
 
-    appendMessage("user", query);
+    const approveBtn = card.querySelector(".btn-approve");
+    const rejectBtn = card.querySelector(".btn-reject");
 
-    const assistantContent = appendMessage("assistant", "");
-    assistantContent.innerHTML = `<em>Thinking...</em>`;
+    const handleDecision = async (decision) => {
+        approveBtn.disabled = true;
+        rejectBtn.disabled = true;
+        card.querySelector(".approval-actions").innerHTML = `<span class="approval-status">${decision === "approve" ? "✅ Approved — Processing..." : "❌ Rejected — Cancelling..."
+            }</span>`;
 
+        await streamResponse("api/chat/resume", { decision, sessionId }, assistantContent);
+    };
+
+    approveBtn.onclick = () => handleDecision("approve");
+    rejectBtn.onclick = () => handleDecision("reject");
+}
+
+async function streamResponse(endpoint, bodyPayload, assistantContent) {
     try {
-        const response = await fetch("api/chat", {
+        const response = await fetch(endpoint, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message: query, sessionId })
+            body: JSON.stringify(bodyPayload)
         });
 
         if (!response.ok) {
@@ -146,7 +180,7 @@ chatForm.addEventListener("submit", async (e) => {
         const decoder = new TextDecoder();
         let fullText = "";
         let toolPill = null;
-        assistantContent.innerHTML = "";
+        let clearedInitialPlaceholder = false;
 
         while (true) {
             const { done, value } = await reader.read();
@@ -163,7 +197,14 @@ chatForm.addEventListener("submit", async (e) => {
                 try {
                     const data = JSON.parse(jsonStr);
 
-                    if (data.type === "tool_start") {
+                    if (!clearedInitialPlaceholder && (data.type === "tool_start" || data.type === "token" || data.type === "interrupt")) {
+                        assistantContent.innerHTML = "";
+                        clearedInitialPlaceholder = true;
+                    }
+
+                    if (data.type === "interrupt") {
+                        renderApprovalCard(data.payload, assistantContent);
+                    } else if (data.type === "tool_start") {
                         const toolMeta = getToolMeta(data.tool);
                         if (!toolPill) {
                             toolPill = document.createElement("div");
@@ -195,7 +236,7 @@ chatForm.addEventListener("submit", async (e) => {
                         attachCopyButtons(assistantContent);
                         scrollToBottom();
                     } else if (data.type === "error") {
-                        assistantContent.innerHTML += `<div style="color: #ef4444; margin-top: 0.5rem;">[Error: ${data.message}]</div>`;
+                        assistantContent.innerHTML += `<div style="color: #ef4444; margin-top: 0.5rem;">[Error: ${data.error || data.message}]</div>`;
                     }
                 } catch (err) {
                     // Ignore SSE json chunk boundary splits
@@ -205,6 +246,22 @@ chatForm.addEventListener("submit", async (e) => {
     } catch (err) {
         assistantContent.innerHTML = `<span style="color:#ef4444">Connection failed: ${err.message}</span>`;
     }
+}
+
+chatForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const query = userInput.value.trim();
+    if (!query) return;
+
+    userInput.value = "";
+    userInput.style.height = "auto";
+
+    appendMessage("user", query);
+
+    const assistantContent = appendMessage("assistant", "");
+    assistantContent.innerHTML = `<em>Thinking...</em>`;
+
+    await streamResponse("api/chat", { message: query, sessionId }, assistantContent);
 });
 
 loadChatHistory();

@@ -36,5 +36,9 @@ export const GraphState = Annotation.Root({
     conversation_summary: Annotation({
         reducer: (prev, next) => next ?? prev,
         default: () => ""
+    }),
+    pending_action: Annotation({
+        reducer: (prev, next) => next !== undefined ? next : prev,
+        default: () => null
     })
 });

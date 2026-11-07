@@ -10,6 +10,8 @@ import { RetryPolicy } from "./policies/retryPolicy.js";
 import { QueryContextualizer } from "../services/queryContextualizer.js";
 import { HumanMessage, SystemMessage, RemoveMessage } from "@langchain/core/messages";
 import { MemorySummarizer } from "../services/memorySummarizer.js";
+import { interrupt } from "@langchain/langgraph";
+import { WorkspaceActionCapability } from "../capabilities/WorkspaceActionCapability.js";
 
 export const model = new ChatGroq({
     apiKey: config.llm.groqApiKey,
@@ -21,6 +23,7 @@ export const registry = new CapabilityRegistry();
 registry.register(new DirectCapability(model));
 registry.register(new WebSearchCapability());
 registry.register(new VectorDocsCapability());
+registry.register(new WorkspaceActionCapability(model));
 const router = new AdaptiveRouter(model, registry);
 const evaluator = new CRAGEvaluator(model);
 const rewriter = new QueryRewriter(model);
@@ -53,6 +56,13 @@ export async function executeCapabilityNode(state) {
         return {
             messages: [output],
             evaluation_status: "COMPLETED"
+        }
+    }
+
+    if (capability.mode === "action") {
+        return {
+            pending_action: output,
+            evaluation_status: "NEEDS_APPROVAL"
         }
     }
 
@@ -163,5 +173,26 @@ export async function summarizerNode(state) {
     return {
         conversation_summary: updatedSummary,
         messages: deleteOperations
+    };
+}
+
+export async function approvalNode(state) {
+    console.log(`[Approval Node] Pausing for human confirmation on: "${state.pending_action?.title}"`);
+    const decision = interrupt(state.pending_action);
+    console.log(`[Approval Node] Resumed with human decision: "${decision}"`);
+    if (decision === "approve") {
+        const capability = registry.get(state.current_capability);
+        const commitResult = await capability.commit(state.pending_action);
+        return {
+            retrieved_context: commitResult,
+            pending_action: null,
+            evaluation_status: "READY_TO_GENERATE"
+        };
+    }
+
+    return {
+        retrieved_context: `The user REJECTED and cancelled the proposed action ("${state.pending_action?.title}"). Politely confirm that the request was cancelled and nothing was saved.`,
+        pending_action: null,
+        evaluation_status: "READY_TO_GENERATE"
     };
 }

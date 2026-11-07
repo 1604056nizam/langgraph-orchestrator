@@ -3,7 +3,13 @@ import { docsTool } from "../tools/docsTool.js";
 
 export class VectorDocsCapability extends BaseCapability {
     constructor() {
-        super("vectorstore", "Principal Software Engineer Internal Documents", `Use specifically if queried anything about principal software engineers qualification, responsibility, expectations`, "context", true);
+        super(
+            "vectorstore",
+            "Nova Tech internal documents",
+            `Use specifically if queried anything about Nova tech principal, actions, employees, policies etc`,
+            "context",
+            true
+        );
     }
 
     async execute(query) {

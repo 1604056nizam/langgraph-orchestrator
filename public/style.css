@@ -421,3 +421,107 @@ textarea#user-input {
     text-align: center;
     margin-top: 0.5rem;
 }
+
+/* Human-in-the-Loop Approval Card */
+.approval-card {
+    background: rgba(30, 41, 59, 0.85);
+    border: 1px solid rgba(245, 158, 11, 0.45);
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    margin-top: 0.25rem;
+    max-width: 520px;
+    box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.4);
+}
+
+.approval-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #f59e0b;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.6rem;
+}
+
+.approval-badge {
+    margin-left: auto;
+    background: rgba(245, 158, 11, 0.15);
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    color: #fbbf24;
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    text-transform: lowercase;
+}
+
+.approval-title {
+    font-size: 1.02rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.4rem;
+}
+
+.approval-details {
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    background: rgba(15, 23, 42, 0.6);
+    border-radius: 8px;
+    padding: 0.6rem 0.75rem;
+    margin-bottom: 0.65rem;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.approval-summary {
+    font-size: 0.92rem;
+    color: var(--text-primary);
+    margin-bottom: 0.9rem;
+}
+
+.approval-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+}
+
+.btn-approve,
+.btn-reject {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.48rem 1rem;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+}
+
+.btn-approve {
+    background: #10b981;
+    color: #ffffff;
+}
+
+.btn-approve:hover {
+    background: #059669;
+}
+
+.btn-reject {
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    color: #f87171;
+}
+
+.btn-reject:hover {
+    background: rgba(239, 68, 68, 0.3);
+    color: #ffffff;
+}
+
+.approval-status {
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}

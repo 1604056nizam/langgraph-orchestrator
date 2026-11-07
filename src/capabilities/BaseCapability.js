@@ -23,4 +23,8 @@ export class BaseCapability {
         throw new Error(`Error() must be implemented by subclass ${this.constructor.name}`);
     }
 
+    async commit(actionProposal) {
+        throw new Error(`commit() must be implemented by action capability ${this.constructor.name}`);
+    }
+
 }

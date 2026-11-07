@@ -6,6 +6,8 @@ export function postCapabilityEdge(state) {
     switch (state.evaluation_status) {
         case "COMPLETED":
             return shouldSummarizeEdge(state);
+        case "NEEDS_APPROVAL":
+            return "approval";
         case "NEEDS_EVALUATION":
             return "evaluate";
         case "READY_TO_GENERATE":

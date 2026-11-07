@@ -1,0 +1,45 @@
+Principal Software Engineer: Responsibilities [WIP]
+
+
+
+1. Technical Strategy & Architecture
+
+- Strategic Technical Planning: Independently translate complex functional and non-functional requirements into robust, executable technical roadmaps and implementation plan.
+
+- System Design & Scalability: Drive implementation-level design decisions, ensuring systems are built for scalability and performance within established architectural guidelines.
+
+- Technical Decision-Making: Act as the primary technical decision-maker for assigned areas, making informed trade-offs between delivery speed, quality, maintainability, and risk.
+
+- Technical Debt Management: Identify, communicate, and help prioritize technical debt within assigned areas based on business impact, delivery risk, maintainability, and long-term system health.
+
+- Risk Management: Proactively identify and mitigate critical technical risks to ensure the delivery of stable, secure, and reliable systems.
+
+
+
+2. Execution & Ownership
+
+- Implementation Ownership: Own and contribute hands-on to technically complex features, modules, integrations, migrations, and system improvements from design through implementation, release support, and stabilization.
+
+- Estimation & Feasibility: Provide reliable technical estimates and feasibility assessments for complex features, modules, integrations, migrations, and uncertain technical areas by identifying assumptions, dependencies, risks, and unknowns.
+
+- Advanced Problem Solving: Lead investigation and resolution of complex bugs, production issues, performance problems, integration failures, and system behavior problems.
+
+- Production Readiness: Ensure critical solutions are ready for production by considering logging, monitoring, observability, failure handling, rollback strategy, data integrity, deployment impact, and supportability.
+
+
+
+3. Innovation & Technical Growth
+
+- Rapid Domain Mastery: Quickly adapt to and master new technologies, tech stacks, or complex legacy codebases and domains as project needs evolve.
+
+- Practical R&D: Proactively explore and R&D technologies and tools beyond direct project exposure, expanding technical depth and suggesting appropriate tech to enhance team capability.
+
+
+
+4. Collaboration
+
+- Stakeholder Collaboration: Collaborate independently with clients, project leads, engineers, QA, DevOps, UI/UX, and other stakeholders to clarify requirements and resolve technical ambiguity.
+
+- Technical Communication: Communicate complex technical topics clearly to both technical and non-technical stakeholders.
+
+- Mentorship: Provide technical guidance and mentorship to engineers on complex design, implementation, debugging, and problem-solving areas when needed.
